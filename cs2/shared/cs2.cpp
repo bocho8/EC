@@ -39,9 +39,9 @@ namespace cs2
 		//offsets from a2x dumper but i could probably add it in later
 		DWORD m_bBombPlanted = 0x9DD;				// bool
 		DWORD m_bBombDropped = 0x9DC;				// bool
-		DWORD dwGameRules = 0x191EC40;				//pointer
+		DWORD dwGameRules = 0x1923360;				//pointer
 
-		DWORD dwGlobalVars = 0x1729B80;				//pointer
+		DWORD dwGlobalVars = 0x172DD50;				//pointer
 
 		QWORD game_rules;
 		QWORD global_vars;
@@ -83,8 +83,9 @@ namespace cs2
 		static int m_modelState = 0;
 		static int m_aimPunchCache = 0;
 		static int m_iShotsFired = 0;
-		static int m_angEyeAngles = 0;
+		//static int m_angEyeAngles = 0;
 		static int m_iIDEntIndex = 0;
+		static int m_iOldIDEntIndex = 0x15BC;
 		static int m_vOldOrigin = 0;
 		static int m_pClippingWeapon = 0;
 		static int v_angle = 0;
@@ -304,7 +305,7 @@ static BOOL cs2::initialize(void)
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_iHealth = *(int*)(entry + 0x08 + 0x10);
 			}
-			else if ((netvars::m_entitySpottedState < 0x1388 || netvars::m_entitySpottedState > 0x1770 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
+			else if ((netvars::m_entitySpottedState < 0x1F40 || netvars::m_entitySpottedState > 0x251C || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x10));
 				netvars::m_entitySpottedState = *(int*)(entry + 0x10);
@@ -369,11 +370,11 @@ static BOOL cs2::initialize(void)
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_iShotsFired = *(int*)(entry + 0x08 + 0x10);
 			}
-			else if (!netvars::m_angEyeAngles && !strcmpi_imp(netvar_name, "m_angEyeAngles") && network_enable)
+			/*else if (!netvars::m_angEyeAngles && !strcmpi_imp(netvar_name, "m_angEyeAngles") && network_enable)
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_angEyeAngles = *(int*)(entry + 0x08 + 0x10);
-			}
+			}*/
 			else if (!netvars::m_flFOVSensitivityAdjust && !strcmpi_imp(netvar_name, "m_flFOVSensitivityAdjust"))
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08));
@@ -494,7 +495,7 @@ static BOOL cs2::initialize(void)
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_iHealth = *(int*)(dos_header + j + 0x08 + 0x10);
 				}
-				else if ((netvars::m_entitySpottedState < 0x1388 || netvars::m_entitySpottedState > 0x1770 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
+				else if ((netvars::m_entitySpottedState < 0x1F40 || netvars::m_entitySpottedState > 0x251C || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x10));
 					netvars::m_entitySpottedState = *(int*)(dos_header + j + 0x10);
@@ -559,11 +560,11 @@ static BOOL cs2::initialize(void)
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_iShotsFired = *(int*)(dos_header + j + 0x08 + 0x10);
 				}
-				else if (!netvars::m_angEyeAngles && !strcmpi_imp(netvar_name, "m_angEyeAngles") && network_enable)
+				/*else if (!netvars::m_angEyeAngles && !strcmpi_imp(netvar_name, "m_angEyeAngles") && network_enable)
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_angEyeAngles = *(int*)(dos_header + j + 0x08 + 0x10);
-				}
+				}*/
 				else if (!netvars::m_flFOVSensitivityAdjust && !strcmpi_imp(netvar_name, "m_flFOVSensitivityAdjust"))
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x10));
@@ -658,7 +659,7 @@ static BOOL cs2::initialize(void)
 	JZ(netvars::m_modelState, E1);
 	JZ(netvars::m_aimPunchCache, E1);
 	JZ(netvars::m_iShotsFired, E1);
-	JZ(netvars::m_angEyeAngles, E1);
+	//JZ(netvars::m_angEyeAngles, E1);
 	JZ(netvars::m_iIDEntIndex, E1);
 	JZ(netvars::m_vOldOrigin, E1);
 	return 1;
@@ -942,15 +943,21 @@ vec3 cs2::player::get_eye_position(QWORD player)
 	origin.z += get_vec_view(player);
 	return origin;
 }
+
 DWORD cs2::player::get_crosshair_id(QWORD player)
 {
 	return vm::read_i32(game_handle, player + netvars::m_iIDEntIndex);
 }
+DWORD cs2::player::get_local_player_index(QWORD player)
+{
+	return vm::read_i32(game_handle, player + netvars::m_iOldIDEntIndex);
+}
+
 DWORD cs2::player::get_shots_fired(QWORD player)
 {
 	return vm::read_i32(game_handle, player + netvars::m_iShotsFired);
 }
-vec2 cs2::player::get_eye_angles(QWORD player)
+/*vec2 cs2::player::get_eye_angles(QWORD player)
 {
 	vec2 value{};
 	if (!vm::read(game_handle, player + netvars::m_angEyeAngles, &value, sizeof(value)))
@@ -958,7 +965,7 @@ vec2 cs2::player::get_eye_angles(QWORD player)
 		value = {};
 	}
 	return value;
-}
+}*/
 float cs2::player::get_fov_multipler(QWORD player)
 {
 	return vm::read_float(game_handle, player + netvars::m_flFOVSensitivityAdjust);
