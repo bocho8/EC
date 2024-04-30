@@ -37,6 +37,7 @@ namespace cs2
 		};
 
 		//offsets from a2x dumper but i could probably add it in later
+		//client.dll.cs
 		DWORD m_bBombPlanted = 0x9DD;				// bool
 		DWORD m_bBombDropped = 0x9DC;				// bool
 		DWORD dwGameRules = 0x1923360;				//pointer
