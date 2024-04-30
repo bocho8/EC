@@ -1,0 +1,7 @@
+﻿  Building 'bootx64' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
+  cs2features.cpp
+  cs2_bhop_efi.cpp
+  utils.cpp
+  Generating Code...
+  bootx64.vcxproj -> C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\bootx64.efi
+  Driver is 'Universal'.

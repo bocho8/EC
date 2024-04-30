@@ -610,7 +610,7 @@ void cs2::features::run(void)
 	float aimbot_fov = 360.0f;
 
 	
-	if ((!b_aimbot_button) || ((config::aimbot_visible_check) && (~cs2::player::get_spottedByMask(best_target) & (1 << local_player_index - 1))))
+	if ((!b_aimbot_button) || ((config::aimbot_visible_check) && (~(cs2::player::get_spottedByMask(best_target) & (1 << (local_player_index - 1))))))
 	{
 		return;
 	}
@@ -870,7 +870,7 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		}
 
 		BOOL spotted;
-		if ((cs2::player::get_spottedByMask(player)) & (1 << local_player_index - 1))
+		if ((cs2::player::get_spottedByMask(player)) & (1 << (local_player_index - 1)))
 		{
 			spotted = 1;
 		}
