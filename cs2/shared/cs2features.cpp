@@ -289,6 +289,21 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 
 	if (b_triggerbot_button && mouse_down_ms == 0)
 	{
+
+		DWORD crosshair_id = cs2::player::get_crosshair_id(local_player);
+		if (weapon_class == cs2::WEAPON_CLASS::Sniper)
+		{
+			if (crosshair_id == (DWORD)-1)
+				return;
+
+			QWORD crosshair_target = cs2::entity::get_client_entity(crosshair_id);
+			if (crosshair_target == 0)
+				return;
+
+			if (cs2::player::get_health(crosshair_target) < 1)
+				return;
+		}
+
 		float accurate_shots_fl = -0.08f;
 		if (weapon_class == cs2::WEAPON_CLASS::Pistol)
 		{
@@ -370,7 +385,7 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 			if ( (math::vec_min_max(eye, dir,
 				math::vec_transform(coll.min, matrix),
 				math::vec_transform(coll.max, matrix),
-				coll.radius)) && (target_distance < 180))
+				coll.radius)) && (target_distance < 180) or weapon_class == cs2::WEAPON_CLASS::Sniper)
 			{
 				DWORD current_ms = cs2::engine::get_current_ms();
 				if (current_ms > mouse_up_ms)
