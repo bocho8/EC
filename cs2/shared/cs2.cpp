@@ -86,7 +86,7 @@ namespace cs2
 		static int m_iShotsFired = 0;
 		//static int m_angEyeAngles = 0;
 		static int m_iIDEntIndex = 0;
-		static int m_iOldIDEntIndex = 0x15BC;
+		static int m_iOldIDEntIndex = 0x13D4;
 		static int m_vOldOrigin = 0;
 		static int m_pClippingWeapon = 0;
 		static int v_angle = 0;
@@ -306,7 +306,7 @@ static BOOL cs2::initialize(void)
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_iHealth = *(int*)(entry + 0x08 + 0x10);
 			}
-			else if ((netvars::m_entitySpottedState < 0x1F40 || netvars::m_entitySpottedState > 0x251C || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
+			else if ((netvars::m_entitySpottedState < 0x2278 || netvars::m_entitySpottedState > 0x14D0 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x10));
 				netvars::m_entitySpottedState = *(int*)(entry + 0x10);
@@ -496,7 +496,7 @@ static BOOL cs2::initialize(void)
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_iHealth = *(int*)(dos_header + j + 0x08 + 0x10);
 				}
-				else if ((netvars::m_entitySpottedState < 0x1F40 || netvars::m_entitySpottedState > 0x251C || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
+				else if ((netvars::m_entitySpottedState < 0x2278 || netvars::m_entitySpottedState > 0x14D0 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x10));
 					netvars::m_entitySpottedState = *(int*)(dos_header + j + 0x10);
@@ -1030,10 +1030,10 @@ cs2::WEAPON_CLASS cs2::player::get_weapon_class(QWORD player)
 		}
 	}
 
-	/* zues */
+	/* Zeus */
 	if (weapon_index == 31)
 	{
-		return cs2::WEAPON_CLASS::Zues;		//zues 31
+		return cs2::WEAPON_CLASS::Zeus;		//Zeus 31
 	}
 
 	/* knife */

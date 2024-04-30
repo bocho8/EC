@@ -134,91 +134,68 @@ inline void cs2::features::update_settings(void)
 	// mouse1 aimkey, mouse5 triggerkey
 	//
 	case 250:
-		config::triggerbot_visible_check = 1;
-		config::visuals_enabled = 1;
-		config::aimbot_visible_check = 1;
-		config::bhop = 0;
 		config::trigger_aim = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
 		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 5.0f;
+		config::aimbot_smooth     = 2.0f;
 		config::visuals_enabled   = 0;
 		break;
 	case 251:
-		config::triggerbot_visible_check = 1;
-		config::visuals_enabled = 1;
-		config::aimbot_visible_check = 1;
-		config::bhop = 0;
 		config::trigger_aim = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.5f;
-		config::aimbot_smooth     = 4.5f;
+		config::aimbot_fov        = 2.0f;
+		config::aimbot_smooth     = 2.0f;
 		break;
 	case 252:
-		config::triggerbot_visible_check = 0;
-		config::visuals_enabled = 1;
-		config::aimbot_visible_check = 0;
-		config::bhop = 0;
 		config::trigger_aim = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 3.0f;
-		config::aimbot_smooth     = 4.0f;
+		config::aimbot_fov        = 2.0f;
+		config::aimbot_smooth     = 2.0f;
 		break;
 	case 253:
-		config::triggerbot_visible_check = 0;
-		config::visuals_enabled = 1;
-		config::aimbot_visible_check = 0;
-		config::bhop = 0;
 		config::trigger_aim = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 10.0f;
+		config::aimbot_fov        = 2.0f;
 		config::aimbot_smooth     = 0.01f;
 		break;
 	case 254:
-		config::triggerbot_visible_check = 1;
-		config::visuals_enabled = 1;
-		config::aimbot_visible_check = 1;
-		config::bhop = 0;
 		config::trigger_aim	  = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 4.0f;
-		config::aimbot_smooth     = 3.5f;
+		config::aimbot_fov        = 2.0f;
+		config::aimbot_smooth     = 2.0f;
 		break;
 	case 255:
-		config::triggerbot_visible_check = 1;
-		config::aimbot_visible_check = 1;
-		config::bhop = 0;
 		config::trigger_aim	  = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 3.5f;
-		config::aimbot_smooth     = 5.0f;
+		config::aimbot_fov        = 2.0f;
+		config::aimbot_smooth     = 2.0f;
 		config::visuals_enabled   = 0;
 		config::spotted_esp = 1;
 		config::visualize_hitbox  = 1;
 		break;
 	default:
-		config::spotted_esp = 1;
-		config::aimbot_visible_check = 1;
-		config::triggerbot_visible_check = 1;
+		config::spotted_esp = 0;
+		config::aimbot_visible_check = 0;
+		config::triggerbot_visible_check = 0;
 		config::bhop = 0;
 		config::trigger_aim	  = 1;
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
 		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 5.0f;
+		config::aimbot_smooth     = 2.0f;
 		config::visuals_enabled   = 1; //esp > legit
 		config::visualize_hitbox  = 1;
 		break;
@@ -226,7 +203,7 @@ inline void cs2::features::update_settings(void)
 
 	switch (weapon_class)
 	{
-	case cs2::WEAPON_CLASS::Zues:
+	case cs2::WEAPON_CLASS::Zeus:
 		config::trigger_aim = 1;
 		config::aimbot_multibone = 1;
 		break;
@@ -278,8 +255,21 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 
 	if (b_triggerbot_button && mouse_down_ms == 0)
 	{
+		//for Zeusbot
+		if (weapon_class == cs2::WEAPON_CLASS::Zeus)
+		{
+			config::aimbot_multibone = 1;
+			vec3 target_origin = cs2::player::get_origin(target_player);
+			vec3 local_origin = cs2::player::get_origin(local_player);
+			target_distance = math::qsqrt(((target_origin.x - local_origin.x) * (target_origin.x - local_origin.x)) + ((target_origin.y - local_origin.y) * (target_origin.y - local_origin.y)));
+		}
+		else
+		{
+			target_distance = 0;
+		}
+
 		DWORD crosshair_id = cs2::player::get_crosshair_id(local_player);
-		if (weapon_class == cs2::WEAPON_CLASS::Sniper)
+		if (weapon_class == cs2::WEAPON_CLASS::Sniper or weapon_class == cs2::WEAPON_CLASS::Zeus)
 		{
 			if (crosshair_id == (DWORD)-1)
 				return;
@@ -362,22 +352,12 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 			matrix[1][3] = bone.y;
 			matrix[2][3] = bone.z;
 
-			//for zuesbot
-			if (weapon_class == cs2::WEAPON_CLASS::Zues)
-			{
-				vec3 target_origin = cs2::player::get_origin(target_player);
-				vec3 local_origin = cs2::player::get_origin(local_player);
-				target_distance = math::qsqrt(((target_origin.x - local_origin.x) * (target_origin.x - local_origin.x)) + ((target_origin.y - local_origin.y) * (target_origin.y - local_origin.y)));
-			}
-			else
-			{
-				target_distance = 0;
-			}
+
 			
 			if ( (math::vec_min_max(eye, dir,
 				math::vec_transform(coll.min, matrix),
 				math::vec_transform(coll.max, matrix),
-				coll.radius)) && (target_distance < 180) or weapon_class == cs2::WEAPON_CLASS::Sniper)
+				coll.radius)) && (target_distance < 180) or weapon_class == cs2::WEAPON_CLASS::Sniper or weapon_class == cs2::WEAPON_CLASS::Zeus)
 			{
 				DWORD current_ms = cs2::engine::get_current_ms();
 				if (current_ms > mouse_up_ms)
@@ -388,33 +368,45 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 				}
 			}
 		}
-		if (b_incrosstrigger_button && mouse_down_ms == 0)
-		{/*
-			//if (weapon_class == cs::WEAPON_CLASS::Sniper)
-			//{
-			if (crosshair_id == (DWORD)-1)
-				return;
+	}
+	if (b_incrosstrigger_button && mouse_down_ms == 0)
+	{
 
-			QWORD crosshair_target = cs2::entity::get_client_entity(crosshair_id);
-			if (crosshair_target == 0)
-				return;
+		DWORD crosshair_id = cs2::player::get_crosshair_id(local_player);
+		//if (weapon_class == cs::WEAPON_CLASS::Sniper)
+		//{
+		if (crosshair_id == (DWORD)-1)
+			return;
 
-			if (cs2::gamemode::is_ffa() == 0 && cs2::player::get_team_num(crosshair_target) == cs2::player::get_team_num(local_player))
-				return;
+		QWORD crosshair_target = cs2::entity::get_client_entity(crosshair_id);
+		if (crosshair_target == 0)
+			return;
 
-			if (cs2::player::get_health(crosshair_target) < 1)
-				return;
-			//}
-			*/
-			DWORD current_ms = cs2::engine::get_current_ms();
-			if (current_ms > mouse_up_ms)
-			{
-				client::mouse1_down();
-				mouse_up_ms = 0;
-				mouse_down_ms = random_number(5, 15) + current_ms;
-			}
+		if (cs2::gamemode::is_ffa() == 0 && cs2::player::get_team_num(crosshair_target) == cs2::player::get_team_num(local_player))
+			return;
+		if (weapon_class == cs2::WEAPON_CLASS::Zeus)
+		{
+			return;//removeme
+			vec3 target_origin = cs2::player::get_origin(target_player);
+			vec3 local_origin = cs2::player::get_origin(local_player);
+			target_distance = math::qsqrt(((target_origin.x - local_origin.x) * (target_origin.x - local_origin.x)) + ((target_origin.y - local_origin.y) * (target_origin.y - local_origin.y)));
+		}
+		else
+		{
+			target_distance = 0;
+		}
+		if (cs2::player::get_health(crosshair_target) < 1 && target_distance < 180)
+			return;
+		//}
+		DWORD current_ms = cs2::engine::get_current_ms();
+		if (current_ms > mouse_up_ms)
+		{
+			client::mouse1_down();
+			mouse_up_ms = 0;
+			mouse_down_ms = random_number(5, 15) + current_ms;
 		}
 	}
+
 }
 
 void cs2::features::run(void)

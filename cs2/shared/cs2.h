@@ -48,7 +48,7 @@ namespace cs2
 		Pistol = 3,
 		Sniper = 4,
 		Rifle = 5,
-		Zues = 6,
+		Zeus = 6,
 		Shotgun = 7,
 	} ;
 
