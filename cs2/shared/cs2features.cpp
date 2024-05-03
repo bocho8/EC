@@ -133,62 +133,26 @@ inline void cs2::features::update_settings(void)
 	//
 	// mouse1 aimkey, mouse5 triggerkey
 	//
-	case 250:
-		config::trigger_aim = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 2.0f;
-		config::visuals_enabled   = 0;
-		break;
-	case 251:
-		config::trigger_aim = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 2.0f;
-		break;
-	case 252:
-		config::trigger_aim = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 2.0f;
-		break;
-	case 253:
-		config::trigger_aim = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 0.01f;
-		break;
-	case 254:
-		config::trigger_aim	  = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 2.0f;
-		break;
-	case 255:
-		config::trigger_aim	  = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 2.0f;
-		config::visuals_enabled   = 0;
+		/*
+	case 202:
 		config::spotted_esp = 1;
-		config::visualize_hitbox  = 1;
+		config::aimbot_visible_check = 1;
+		config::triggerbot_visible_check = 1;
+		config::bhop = 0;
+		config::trigger_aim = 1;
+		config::aimbot_button = 317;
+		config::triggerbot_button = 320;
+		config::incrosstriggerbot_button = 82;
+		config::aimbot_fov = 2.0f;
+		config::aimbot_smooth = 2.0f;
+		config::visuals_enabled = 1; //esp > legit
+		config::visualize_hitbox = 1;
 		break;
+		*/
 	default:
 		config::spotted_esp = 0;
-		config::aimbot_visible_check = 0;
-		config::triggerbot_visible_check = 0;
+		config::aimbot_visible_check = 1;
+		config::triggerbot_visible_check = 1;
 		config::bhop = 0;
 		config::trigger_aim	  = 1;
 		config::aimbot_button     = 317;
@@ -386,7 +350,7 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 			return;
 		if (weapon_class == cs2::WEAPON_CLASS::Zeus)
 		{
-			return;//removeme
+			//return;//removeme
 			vec3 target_origin = cs2::player::get_origin(target_player);
 			vec3 local_origin = cs2::player::get_origin(local_player);
 			target_distance = math::qsqrt(((target_origin.x - local_origin.x) * (target_origin.x - local_origin.x)) + ((target_origin.y - local_origin.y) * (target_origin.y - local_origin.y)));
@@ -635,13 +599,23 @@ void cs2::features::run(void)
 	vec3  aimbot_pos{};
 	float aimbot_fov = 360.0f;
 
-	
+	/*
 	if ((!b_aimbot_button) || ((config::aimbot_visible_check) && (~(cs2::player::get_spottedByMask(best_target) & (1 << (local_player_index - 1))))))
 	{
 		return;
 	}
-	
-
+	*/
+	if (!b_aimbot_button)
+	{
+		return;
+	}
+	if (config::triggerbot_visible_check && !b_triggerbot_button)
+	{
+		if (!cs2::player::is_visible(aimbot_target) && config::aimbot_visible_check)
+		{
+			return;
+		}
+	}
 	if (config::aimbot_multibone)
 	{
 		//
@@ -894,7 +868,7 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		{
 			continue;
 		}
-
+		/*
 		BOOL spotted;
 		if ((cs2::player::get_spottedByMask(player)) & (1 << (local_player_index - 1)))
 		{
@@ -904,12 +878,24 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		{
 			spotted = 0;
 		}
-
-		if ((config::visuals_enabled) || (config::spotted_esp && (cs2::player::get_spottedByMask(player) != 0)))
+		*/
+		/*
+		BOOL spotted;
+		if (cs2::player::is_visible(aimbot_target))
+		{
+			spotted = 1;
+		}
+		else
+		{
+			spotted = 0;
+		}
+		*/
+		BOOL spotted = 1;
+		if ((config::visuals_enabled) && (config::spotted_esp && cs2::player::is_visible(player)))
 		{
 			esp(local_player, player, head);
 		}
-		
+		/*
 		if ((config::aimbot_visible_check && b_aimbot_button) && (spotted == 1))
 		{
 			continue;
@@ -918,7 +904,7 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		{
 			continue;
 		}
-		
+		*/
 
 		vec3 best_angle = get_target_angle(local_player, head, num_shots, aim_punch);
 

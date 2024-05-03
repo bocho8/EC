@@ -124,6 +124,7 @@ namespace cs2
 		BOOL get_buy_menu(QWORD player);
 		DWORD get_health(QWORD player);
 		DWORD get_team_num(QWORD player);
+		BOOL is_visible(QWORD player);
 		int   get_life_state(QWORD player);
 		vec3  get_origin(QWORD player);
 		float get_vec_view(QWORD player);

@@ -40,9 +40,11 @@ namespace cs2
 		//client.dll.cs
 		DWORD m_bBombPlanted = 0x9DD;				// bool
 		DWORD m_bBombDropped = 0x9DC;				// bool
-		DWORD dwGameRules = 0x1923360;				//pointer
 
-		DWORD dwGlobalVars = 0x172DD50;				//pointer
+		//offsets.cs(these update often)
+		DWORD dwGameRules = 0x1926DD0;				//pointer
+
+		DWORD dwGlobalVars = 0x1730F20;				//pointer
 
 		QWORD game_rules;
 		QWORD global_vars;
@@ -86,6 +88,7 @@ namespace cs2
 		static int m_iShotsFired = 0;
 		//static int m_angEyeAngles = 0;
 		static int m_iIDEntIndex = 0;
+		//client.dll.cs
 		static int m_iOldIDEntIndex = 0x13D4;
 		static int m_vOldOrigin = 0;
 		static int m_pClippingWeapon = 0;
@@ -921,6 +924,29 @@ DWORD cs2::player::get_team_num(QWORD player)
 {
 	return vm::read_i32(game_handle, player + netvars::m_iTeamNum);
 }
+
+//glowesp detection vector?
+
+//float cs::player::detected_by_enemy_sensor_time(QWORD player)
+//{
+//	return vm::read_float(game_handle, player + netvars::m_flDetectedByEnemySensorTime);
+//}
+
+//update
+//public const nint m_entitySpottedState = 0x2278; // EntitySpottedState_t
+//public static class EntitySpottedState_t {
+//public const nint m_bSpotted = 0x8; // bool
+//public const nint m_bSpottedByMask = 0xC; // uint32_t[2]
+//}
+
+BOOL cs2::player::is_visible(QWORD player)
+{
+	//vm::write_float(game_handle, player + netvars::m_flDetectedByEnemySensorTime, 86400.f);
+	int mask = vm::read_i32(game_handle, (QWORD)(player + 0x2278 + 0x8));// ?
+	int base = vm::read_i32(game_handle, (QWORD)(direct::local_player));
+	return (mask & (1 << base)) != 0;
+}
+
 int cs2::player::get_life_state(QWORD player)
 {
 	return vm::read_i32(game_handle, player + netvars::m_lifeState);
@@ -1072,6 +1098,7 @@ cs2::WEAPON_CLASS cs2::player::get_weapon_class(QWORD player)
 	/* pistol */
 	{
 		WORD data[] = {
+			40, // {"ssg08"}, actully the ssg-08 should shoot for head like a pistol xD
 			32, // {"hkp2000"},
 			61, // {"usp-s"},
 			1, // {"deagle"},
@@ -1092,7 +1119,6 @@ cs2::WEAPON_CLASS cs2::player::get_weapon_class(QWORD player)
 	/* sniper */
 	{
 		WORD data[] = {
-			40, // {"ssg08"}, actully the ssg-08 is a sniper and not a pistol
 			9, // {"awp"},
 			38, // {"scar20"},
 			11, // {"g3sg1"},
