@@ -150,7 +150,7 @@ inline void cs2::features::update_settings(void)
 		break;
 		*/
 	default:
-		config::spotted_esp = 0;
+		config::spotted_esp = 1;
 		config::aimbot_visible_check = 1;
 		config::triggerbot_visible_check = 1;
 		config::bhop = 0;
@@ -891,10 +891,14 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		}
 		*/
 		BOOL spotted = 1;
-		if ((config::visuals_enabled) && (config::spotted_esp && cs2::player::is_visible(player)))
-		{
-			esp(local_player, player, head);
+		if (config::visuals_enabled) {
+			if (!config::spotted_esp || (config::spotted_esp && cs2::player::is_visible(player))) {
+				esp(local_player, player, head);
+			}
 		}
+
+
+
 		/*
 		if ((config::aimbot_visible_check && b_aimbot_button) && (spotted == 1))
 		{
