@@ -137,22 +137,21 @@ inline void cs2::features::update_settings(void)
 	case 202:
 		config::spotted_esp = 1;
 		config::aimbot_visible_check = 1;
-		config::triggerbot_visible_check = 1;
+		config::triggerbot_visible_check = 0;
 		config::bhop = 0;
-		config::trigger_aim = 1;
-		config::aimbot_button = 317;
+		config::trigger_aim	  = 1;
+		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov = 2.0f;
-		config::aimbot_smooth = 2.0f;
-		config::visuals_enabled = 1; //esp > legit
-		config::visualize_hitbox = 1;
-		break;
-		*/
+		config::aimbot_fov        = 2.0f;
+		config::aimbot_smooth     = 2.0f;
+		config::visuals_enabled   = 1; //esp > legit
+		config::visualize_hitbox  = 1;
+		break;*/
 	default:
-		config::spotted_esp = 1;
+		config::spotted_esp = 0;
 		config::aimbot_visible_check = 1;
-		config::triggerbot_visible_check = 1;
+		config::triggerbot_visible_check = 0;
 		config::bhop = 0;
 		config::trigger_aim	  = 1;
 		config::aimbot_button     = 317;
@@ -605,17 +604,16 @@ void cs2::features::run(void)
 		return;
 	}
 	*/
+
+	if (config::triggerbot_visible_check && !cs2::player::is_visible(aimbot_target))
+	{
+		return;
+	}
 	if (!b_aimbot_button)
 	{
 		return;
 	}
-	if (config::triggerbot_visible_check && !b_triggerbot_button)
-	{
-		if (!cs2::player::is_visible(aimbot_target) && config::aimbot_visible_check)
-		{
-			return;
-		}
-	}
+
 	if (config::aimbot_multibone)
 	{
 		//
@@ -813,8 +811,12 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 	float best_fov = 360.0f;
 	vec3  angle{};
 	vec3  aimpos{};
-	QWORD best_node = 0;
-	
+
+	QWORD visible_player = 0;
+	float visible_fov = 0.0f;
+	vec3  visible_aimpos{};
+	vec3  visible_angle{};
+
 	for (int i = 1; i < 32; i++)
 	{
 		QWORD ent = cs2::entity::get_client_entity(i);
@@ -832,13 +834,6 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		}
 
 		QWORD player = cs2::entity::get_player(ent);
-
-		if (player == cs2::player::get_crosshair_id(cs2::entity::get_local_player_controller()))
-		{
-			features::local_player_index = i;
-			continue;
-		}
-
 		if (player == 0)
 		{
 			continue;
@@ -862,115 +857,60 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		{
 			continue;
 		}
-		
+
 		vec3 head{};
 		if (!cs2::node::get_bone_position(node, 6, &head))
 		{
 			continue;
 		}
-		/*
-		BOOL spotted;
-		if ((cs2::player::get_spottedByMask(player)) & (1 << (local_player_index - 1)))
-		{
-			spotted = 1;
-		}
-		else
-		{
-			spotted = 0;
-		}
-		*/
-		/*
-		BOOL spotted;
-		if (cs2::player::is_visible(aimbot_target))
-		{
-			spotted = 1;
-		}
-		else
-		{
-			spotted = 0;
-		}
-		*/
-		BOOL spotted = 1;
+		//		if (config::visuals_enabled && b_visuals_button)
+
 		if (config::visuals_enabled) {
-			if (!config::spotted_esp || (config::spotted_esp && cs2::player::is_visible(player))) {
+			if (!config::spotted_esp || (config::spotted_esp && cs2::player::is_visible(player)) or cs2::player::get_life_state(player) != 256) {
 				esp(local_player, player, head);
 			}
 		}
 
-
-
-		/*
-		if ((config::aimbot_visible_check && b_aimbot_button) && (spotted == 1))
+		if (config::visualize_hitbox)
 		{
-			continue;
+			render_normal_position(angle, 8, 8, 255, 0, 0, NULL);
 		}
-		if ((config::triggerbot_visible_check && b_triggerbot_button) && (spotted == 1))
-		{
-			continue;
-		}
-		*/
+
+		//	if (config::glow_enabled)
+		//	{
+		//		cs::player::write_detected_by_enemy_sensor_time(player, 86400.f);
+		//	}
 
 		vec3 best_angle = get_target_angle(local_player, head, num_shots, aim_punch);
 
 		float fov = math::get_fov(va, *(vec3*)&best_angle);
-		
+
 		if (fov < best_fov)
 		{
 			best_fov = fov;
 			*target = player;
 			aimpos = head;
 			angle = best_angle;
-			best_node = node;
+			if (cs2::player::is_visible(player) or b_triggerbot_button)
+			{
+				visible_aimpos = head;
+				visible_angle = best_angle;
+				visible_player = player;
+				visible_fov = fov;
+			}
 		}
 	}
-	
-	if (b_triggerbot_button && !b_aimbot_button)
+	//if (visible_player != 1)
+	//{
+	best_fov = visible_fov;
+	*target = visible_player;
+	aimpos = visible_aimpos;
+	angle = visible_angle;
+	//}
+	if (best_fov != 360.0f)
 	{
-
-		vec3 pos{};
-		vec3 best_pos{};
-		for (int i = 1; i < 7; i++)
-		{
-			//bone pos
-			if (!best_node)
-			{
-				return;
-			}
-	
-			if (!cs2::node::get_bone_position(best_node, i, &pos))
-			{
-				continue;
-			}
-			vec3 best_angle = get_target_angle(local_player, pos, num_shots, aim_punch);
-			float fov = math::get_fov(va, *(vec3*)&best_angle);
-			if (fov <= best_fov)
-			{
-				best_fov = fov;
-				aimpos = pos;
-				aimbot_bone = i;
-				angle = best_angle;
-				best_pos = pos;
-			}
-		}
-		if (config::visualize_hitbox)
-		{
-			render_normal_position(best_pos,8 , 8, 255, 0, 0, NULL);
-		}
-
-		if (best_fov != 360.0f)
-		{
-			event_state = 1;
-			features::has_target_event(local_player, *target, best_fov, aim_punch, angle, va, aimpos);
-		}
-	}
-	else
-	{
-		if (best_fov != 360.0f)
-		{
-			event_state = 1;
-			features::has_target_event(local_player, *target, best_fov, aim_punch, angle, va, aimpos);
-		}
-	
+		event_state = 1;
+		features::has_target_event(local_player, *target, best_fov, aim_punch, angle, va, aimpos);
 	}
 }
 
