@@ -8,5 +8,5 @@ C:\Users\nevet\source\repos\!1NewECHunter\apex\shared\apexfeatures.cpp;C:\Users\
 C:\Users\nevet\source\repos\!1NewECHunter\library\vm\km_ctx\vm.cpp;C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\vm.obj
 C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\gdi.cpp;C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\gdi.obj
 C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\kernel.cpp;C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\kernel.obj
-C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\main.cpp;C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\main.obj
+C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\main_compatibility.cpp;C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\main_compatibility.obj
 C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\utils.cpp;C:\Users\nevet\source\repos\!1NewECHunter\projects\EFI\bootx64\x64\Release\utils.obj

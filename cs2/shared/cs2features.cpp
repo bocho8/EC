@@ -573,10 +573,10 @@ void cs2::features::run(void)
 
 	aimbot_active = 0;
 
-	if (!config::aimbot_enabled || ((cs2::player::get_buy_menu(local_player)) && (cs2::player::get_buy_zone(local_player) == 257)))
-	{
-		return;
-	}
+	//if (!config::aimbot_enabled || ((cs2::player::get_buy_menu(local_player)) && (cs2::player::get_buy_zone(local_player) == 257)))
+	//{
+	//	return;
+	//}
 
 	//
 	// no valid target found
@@ -839,6 +839,9 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 			continue;
 		}
 
+		//if (cs2::player::get_health(player) < 1)
+		//	return;
+
 		if (ffa == 0)
 		{
 			if (cs2::player::get_team_num(player) == cs2::player::get_team_num(local_player))
@@ -865,15 +868,9 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 		}
 		//		if (config::visuals_enabled && b_visuals_button)
 
-		if (config::visuals_enabled) {
-			if (!config::spotted_esp || (config::spotted_esp && cs2::player::is_visible(player)) or cs2::player::get_life_state(player) != 256) {
-				esp(local_player, player, head);
-			}
-		}
-
-		if (config::visualize_hitbox)
+		if (config::visuals_enabled)
 		{
-			render_normal_position(angle, 8, 8, 255, 0, 0, NULL);
+			esp(local_player, player, head);
 		}
 
 		//	if (config::glow_enabled)
