@@ -42,9 +42,9 @@ namespace cs2
 		DWORD m_bBombDropped = 0x9DC;				// bool
 
 		//offsets.cs(these update often)
-		DWORD dwGameRules = 0x1926DD0;				//pointer
+		DWORD dwGameRules = 0x1924EF0;				//pointer
 
-		DWORD dwGlobalVars = 0x1730F20;				//pointer
+		DWORD dwGlobalVars = 0x172EEE0;				//pointer
 
 		QWORD game_rules;
 		QWORD global_vars;
