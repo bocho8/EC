@@ -35,7 +35,11 @@ namespace cs2
 			QWORD current_map;
 			QWORD current_map_name;
 		};
-
+		
+		
+		QWORD matchmakingdll;
+		
+		
 		//offsets from a2x dumper but i could probably add it in later
 		//client.dll.cs
 		DWORD m_bBombPlanted = 0x9DD;				// bool
@@ -119,6 +123,7 @@ inline const char *get_engine_name() { return vm::get_target_os() == VmOs::Windo
 inline const char *get_sdl3_name() { return vm::get_target_os() == VmOs::Windows ? "SDL3.dll" : "libSDL3.so.0"; }
 inline const char *get_tier0_name() { return vm::get_target_os() == VmOs::Windows ? "tier0.dll" : "libtier0.so"; }
 inline const char *get_inputsystem_name() { return vm::get_target_os() == VmOs::Windows ? "inputsystem.dll" : "libinputsystem.so"; }
+inline const char* get_matchmaking_name() { return vm::get_target_os() == VmOs::Windows ? "matchmaking.dll" : "matchmaking.so"; }
 inline int get_entity_off() { return vm::get_target_os() == VmOs::Windows ? 0x58 : 0x50; }
 inline int get_button_off() { return vm::get_target_os() == VmOs::Windows ? 0x13 : 0x14; }
 inline int get_viewangles_off() { return vm::get_target_os() == VmOs::Windows ? 0x6140 : 0x4528; }
@@ -155,6 +160,7 @@ static BOOL cs2::initialize(void)
 	offsets::clientdll = client_dll;
 	JZ(sdl = vm::get_module(game_handle, get_sdl3_name()), E1);
 	JZ(inputsystem = vm::get_module(game_handle, get_inputsystem_name()), E1);
+	JZ(cs2::offsets::matchmakingdll = vm::get_module(game_handle, get_matchmaking_name()), E1);
 	JZ(direct::previous_xy = vm::scan_pattern_direct(game_handle, inputsystem, "\xF3\x0F\x10\x0D", "xxxx", 4), E1);
 	direct::previous_xy = vm::get_relative_address(game_handle, direct::previous_xy, 4, 8);
 	interfaces::resource = get_interface(vm::get_module(game_handle, get_engine_name()), "GameResourceServiceClientV0");
@@ -874,6 +880,11 @@ BOOL cs2::offsets::get_BombPlanted()
 	bool bomb_down;
 	vm::read(game_handle, game_rules + m_bBombPlanted, &bomb_down, sizeof(bomb_down));
 	return bomb_down;
+}
+
+QWORD cs2::offsets::get_accept_state()
+{
+	return (cs2::offsets::matchmakingdll);
 }
 
 BOOL cs2::offsets::get_BombDropped()
