@@ -118,7 +118,7 @@ inline void cs2::features::update_settings(void)
 	// default global settings
 	//
 	config::rcs = 0;
-	config::aimbot_enabled = 1;
+	config::aimbot_enabled = 0;
 	config::aimbot_multibone = 1;
 
 
@@ -148,6 +148,9 @@ inline void cs2::features::update_settings(void)
 		config::visuals_enabled   = 1; //esp > legit
 		config::visualize_hitbox  = 1;
 		break;*/
+	//case 200:
+	//	config::visuals_enabled = 0;
+	//	break;
 	default:
 		config::spotted_esp = 0;
 		config::aimbot_visible_check = 1;
@@ -157,7 +160,7 @@ inline void cs2::features::update_settings(void)
 		config::aimbot_button     = 317;
 		config::triggerbot_button = 320;
 		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
+		config::aimbot_fov        = 200.0f;
 		config::aimbot_smooth     = 2.0f;
 		config::visuals_enabled   = 1; //esp > legit
 		config::visualize_hitbox  = 1;
@@ -366,7 +369,7 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 		{
 			client::mouse1_down();
 			mouse_up_ms = 0;
-			mouse_down_ms = random_number(5, 15) + current_ms;
+			mouse_down_ms = random_number(25, 35) + current_ms;
 		}
 	}
 
@@ -609,7 +612,7 @@ void cs2::features::run(void)
 	{
 		return;
 	}
-	if (!b_aimbot_button)
+	if (!b_aimbot_button or config::aimbot_enabled == 0)
 	{
 		return;
 	}
@@ -1018,6 +1021,13 @@ static void cs2::features::esp(QWORD local_player, QWORD target_player, vec3 hea
 	UNREFERENCED_PARAMETER(head);
 #endif
 
+	if (config::spotted_esp)
+	{
+		if (!cs2::player::is_visible(target_player))
+		{
+			return;
+		}
+	}
 	vec3 origin = cs2::player::get_origin(target_player);
 	vec3 top_origin = origin;
 	

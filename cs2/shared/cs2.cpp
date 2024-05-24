@@ -42,13 +42,13 @@ namespace cs2
 		
 		//offsets from a2x dumper but i could probably add it in later
 		//client.dll.cs
-		DWORD m_bBombPlanted = 0x9DD;				// bool
-		DWORD m_bBombDropped = 0x9DC;				// bool
+		DWORD m_bBombPlanted = 0x9A5;				// bool
+		DWORD m_bBombDropped = 0x9A4;				// bool
 
 		//offsets.cs(these update often)
-		DWORD dwGameRules = 0x1924EF0;				//pointer
+		DWORD dwGameRules = 0x1A00D08;				//pointer
 
-		DWORD dwGlobalVars = 0x172EEE0;				//pointer
+		DWORD dwGlobalVars = 0x1801BF0;				//pointer
 
 		QWORD game_rules;
 		QWORD global_vars;
@@ -91,9 +91,9 @@ namespace cs2
 		static int m_aimPunchCache = 0;
 		static int m_iShotsFired = 0;
 		//static int m_angEyeAngles = 0;
-		static int m_iIDEntIndex = 0;
+		static int m_iIDEntIndex = 0x13A8;
 		//client.dll.cs
-		static int m_iOldIDEntIndex = 0x13D4;
+		static int m_iOldIDEntIndex = 0x13CC;
 		static int m_vOldOrigin = 0;
 		static int m_pClippingWeapon = 0;
 		static int v_angle = 0;
@@ -126,7 +126,7 @@ inline const char *get_inputsystem_name() { return vm::get_target_os() == VmOs::
 inline const char* get_matchmaking_name() { return vm::get_target_os() == VmOs::Windows ? "matchmaking.dll" : "matchmaking.so"; }
 inline int get_entity_off() { return vm::get_target_os() == VmOs::Windows ? 0x58 : 0x50; }
 inline int get_button_off() { return vm::get_target_os() == VmOs::Windows ? 0x13 : 0x14; }
-inline int get_viewangles_off() { return vm::get_target_os() == VmOs::Windows ? 0x6140 : 0x4528; }
+inline int get_viewangles_off() { return vm::get_target_os() == VmOs::Windows ? 0x6140 : 0x4528; }//offsets
 #ifdef DEBUG
 #define JZ(val,field) \
 if ((val) == 0)  \
@@ -800,7 +800,7 @@ BOOL cs2::entity::is_player(QWORD controller)
 	{
 		return 1;
 	}
-	QWORD vfunc = get_interface_function(controller, 144);
+	QWORD vfunc = get_interface_function(controller, 150);
 	if (vfunc == 0)
 		return 0;
 	DWORD value = vm::read_i32(game_handle, vfunc);
@@ -881,12 +881,12 @@ BOOL cs2::offsets::get_BombPlanted()
 	vm::read(game_handle, game_rules + m_bBombPlanted, &bomb_down, sizeof(bomb_down));
 	return bomb_down;
 }
-
+/*unused
 QWORD cs2::offsets::get_accept_state()
 {
 	return (cs2::offsets::matchmakingdll);
 }
-
+*/
 BOOL cs2::offsets::get_BombDropped()
 {
 	vm::read(game_handle, offsets::clientdll + offsets::dwGameRules, &offsets::game_rules, sizeof(offsets::game_rules));
