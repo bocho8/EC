@@ -1,5 +1,6 @@
 #include "cs2game.h"
 
+
 //
 // private data. only available for features.cpp
 //
@@ -92,7 +93,7 @@ namespace config
 	static BOOL  triggerbot_visible_check;
 	static BOOL  visualize_hitbox;
 	static BOOL  bhop;
-	static BOOL  rcs;
+	static BOOL  standalone_rcs;
 	static BOOL  aimbot_enabled;
 	static DWORD aimbot_button;
 	static float aimbot_fov;
@@ -117,7 +118,8 @@ inline void cs2::features::update_settings(void)
 	//
 	// default global settings
 	//
-	config::rcs = 0;
+	//standlone rcs is still weird but better than default, improve it or don't use it
+	config::standalone_rcs = 0;
 	config::aimbot_enabled = 1;
 	config::aimbot_multibone = 1;
 
@@ -531,7 +533,7 @@ void cs2::features::run(void)
 	vec2  aim_punch   = cs2::player::get_vec_punch(local_player);
 	float sensitivity = cs2::mouse::get_sensitivity() * cs2::player::get_fov_multipler(local_player);
 
-	if (config::rcs)
+	if (config::standalone_rcs && !(aimbot_active))
 	{
 		standalone_rcs(num_shots, aim_punch, sensitivity);
 	}
@@ -919,20 +921,67 @@ static void cs2::features::get_best_target(BOOL ffa, QWORD local_controller, QWO
 	}
 }
 
+// Random number generator state
+UINT32 rand_state = 1;
+// Random number generator
+void initialize_random(UINT32 seed) {
+	rand_state = seed;
+}
+
+float random_float(float min, float max) {
+	// Linear Congruential Generator (LCG) constants
+	const UINT32 a = 1103515245;
+	const UINT32 c = 12345;
+	const UINT32 m = 0x7fffffff;  // 2^31-1
+
+	rand_state = (a * rand_state + c) & m;
+	float random = (float)rand_state / (float)m;
+	float diff = max - min;
+	float r = random * diff;
+	return min + r;
+}
+
 static void cs2::features::standalone_rcs(DWORD num_shots, vec2 vec_punch, float sensitivity)
 {
+	// Global variables for smoothing
+	vec2 total_recoil_correction = { 0, 0 };
+	vec2 remaining_recoil_correction = { 0, 0 };
+	int smoothing_frames = 5;  // Number of frames to apply smoothing
+
 	if (num_shots > 1)
 	{
 		float x = (vec_punch.x - rcs_old_punch.x) * -1.0f;
 		float y = (vec_punch.y - rcs_old_punch.y) * -1.0f;
-		
+
+		// Calculate total mouse movement needed
 		int mouse_angle_x = (int)(((y * 2.0f) / sensitivity) / -0.022f);
 		int mouse_angle_y = (int)(((x * 2.0f) / sensitivity) / 0.022f);
 
-		if (!aimbot_active)
+		// Update total and remaining recoil correction
+		total_recoil_correction.x += mouse_angle_x;
+		total_recoil_correction.y += mouse_angle_y;
+
+		// Smoothing and humanization
+		float smoothing_factor = 1.0f / smoothing_frames;
+		float humanization_factor = 0.5f; // Adjust for more or less humanization
+
+		for (int i = 0; i < smoothing_frames; ++i)
 		{
-			client::mouse_move(mouse_angle_x, mouse_angle_y);
+			if (!aimbot_active)
+			{
+				int smooth_mouse_angle_x = (int)((total_recoil_correction.x * smoothing_factor) + random_float(-humanization_factor, humanization_factor));
+				int smooth_mouse_angle_y = (int)((total_recoil_correction.y * smoothing_factor) + random_float(-humanization_factor, humanization_factor));
+
+				client::mouse_move(smooth_mouse_angle_x, smooth_mouse_angle_y);
+
+				remaining_recoil_correction.x -= smooth_mouse_angle_x;
+				remaining_recoil_correction.y -= smooth_mouse_angle_y;
+			}
 		}
+		// Update remaining recoil correction for the next frame
+		total_recoil_correction.x = remaining_recoil_correction.x;
+		total_recoil_correction.y = remaining_recoil_correction.y;
+
 	}
 	rcs_old_punch = vec_punch;
 }
