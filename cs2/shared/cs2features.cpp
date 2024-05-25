@@ -130,6 +130,28 @@ inline void cs2::features::update_settings(void)
 
 	switch (crosshair_alpha)
 	{
+	case 200:
+		config::visuals_enabled = 0;
+		config::aimbot_enabled = 0;
+		break;
+	case 201:
+		config::spotted_esp = 1;
+		config::aimbot_enabled = 1;
+		config::triggerbot_visible_check = 1;
+		config::aimbot_visible_check = 1;
+		break;
+	case 202:
+		config::visuals_enabled = 1;
+		config::aimbot_enabled = 0;
+		break;
+	case 203:
+		config::spotted_esp = 1;
+		config::aimbot_enabled = 0;
+		break;
+
+
+
+
 	default:
 		config::spotted_esp = 0;
 		config::aimbot_visible_check = 1;
@@ -141,8 +163,8 @@ inline void cs2::features::update_settings(void)
 		config::incrosstriggerbot_button = 82;
 		config::aimbot_fov        = 2.0f;
 		config::aimbot_smooth     = 2.0f;
-		config::visuals_enabled   = 1; //esp > legit
-		config::visualize_hitbox  = 1;
+		config::visuals_enabled   = 1;
+		config::visualize_hitbox  = 0;
 		break;
 	}
 
@@ -212,14 +234,15 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 		{
 			target_distance = 0;
 		}
-
+		
 		DWORD crosshair_id = cs2::player::get_crosshair_id(local_player);
+		QWORD crosshair_target = cs2::entity::get_client_entity(crosshair_id);
 		if (weapon_class == cs2::WEAPON_CLASS::Sniper or weapon_class == cs2::WEAPON_CLASS::Zeus)
 		{
 			if (crosshair_id == (DWORD)-1)
 				return;
 
-			QWORD crosshair_target = cs2::entity::get_client_entity(crosshair_id);
+			
 			if (crosshair_target == 0)
 				return;
 
@@ -230,6 +253,9 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 		{
 			cs2:config::aimbot_multibone = 0;
 		}
+
+		if (cs2::player::get_health(crosshair_target) < 1 && target_distance < 180)
+			return;
 
 		float accurate_shots_fl = -0.08f;
 		if (weapon_class == cs2::WEAPON_CLASS::Pistol)

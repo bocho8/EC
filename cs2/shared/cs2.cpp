@@ -71,37 +71,37 @@ namespace cs2
 	}
 	namespace netvars
 	{
-		static int m_entitySpottedState = 0x2278;//m_entitySpottedState = 0x1698;
-		static int m_bSpotted = 0x8; //m_bSpotted = 0x8;
-		static int m_bSpottedByMask = 0xC; // m_bSpottedByMask = 0xC;
-		static int m_MoveType = 0x425;
-		static int m_bInBuyZone = 0x14C8;
-		static int m_bIsBuyMenuOpen = 0x151A;
-		static int m_flFOVSensitivityAdjust = 0x126C;
-		static int m_pGameSceneNode = 0x308;
-		static int m_iHealth = 0x324;
-		static int m_fFlags = 0x3CC;
-		static int m_lifeState = 0x328;
-		static int m_iTeamNum = 0x3C3;
-		static int m_vecViewOffset = 0xC50;
-		static int m_vecOrigin = 0x88;
-		static int m_bDormant = 0xEF;
-		static int m_hPawn = 0x5FC;
-		static int m_modelState = 0x170;
-		static int m_aimPunchCache = 0x14F0;
-		static int m_iShotsFired = 0x22A4;
+		static int m_entitySpottedState = 0;//m_entitySpottedState = 0x1698;
+		static int m_bSpotted = 0; //m_bSpotted = 0x8;
+		static int m_bSpottedByMask = 0; // m_bSpottedByMask = 0xC;
+		static int m_MoveType = 0;
+		static int m_bInBuyZone = 0;
+		static int m_bIsBuyMenuOpen = 0;
+		static int m_flFOVSensitivityAdjust = 0;
+		static int m_pGameSceneNode = 0;
+		static int m_iHealth = 0;
+		static int m_fFlags = 0;
+		static int m_lifeState = 0;
+		static int m_iTeamNum = 0;
+		static int m_vecViewOffset = 0;
+		static int m_vecOrigin = 0;
+		static int m_bDormant = 0;
+		static int m_hPawn = 0;
+		static int m_modelState = 0;
+		static int m_aimPunchCache = 0;
+		static int m_iShotsFired = 0;
 		//static int m_angEyeAngles = 0;
 		static int m_iIDEntIndex = 0x13A8;
 		//client.dll.cs
-		static int m_iOldIDEntIndex = 0x13CC;
-		static int m_vOldOrigin = 0x1274;
-		static int m_pClippingWeapon = 0x12F0;
-		static int v_angle = 0x119C;
-		static int m_bIsDefusing = 0x2292;
-		static int m_bPawnHasDefuser = 0x7F0;
-		static int m_hActiveWeapon = 0x58;
-		static int m_pWeaponServices = 0x10F8;
-		static int m_sSanitizedPlayerName = 0x740;
+		static int m_iOldIDEntIndex = 0;
+		static int m_vOldOrigin = 0;
+		static int m_pClippingWeapon = 0;
+		static int v_angle = 0;
+		static int m_bIsDefusing = 0;
+		static int m_bPawnHasDefuser = 0;
+		static int m_hActiveWeapon = 0;
+		static int m_pWeaponServices = 0;
+		//static int m_sSanitizedPlayerName = 0;
 	}
 	static BOOL initialize(void);
 	static QWORD get_interface(QWORD base, PCSTR name);
@@ -410,6 +410,8 @@ static BOOL cs2::initialize(void)
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_vecOrigin = *(int*)(entry + 0x08 + 0x10);
 			}
+			if (netvars::m_vecOrigin > 0x200) netvars::m_vecOrigin = 0;
+			
 			else if (!netvars::m_iIDEntIndex && !strcmpi_imp(netvar_name, "m_iIDEntIndex") && network_enable)
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
@@ -600,6 +602,8 @@ static BOOL cs2::initialize(void)
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_vecOrigin = *(int*)(dos_header + j + 0x08 + 0x10);
 				}
+				if (netvars::m_vecOrigin > 0x200) netvars::m_vecOrigin = 0;
+				
 				else if (!netvars::m_iIDEntIndex && !strcmpi_imp(netvar_name, "m_iIDEntIndex") && network_enable)
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
@@ -640,12 +644,12 @@ static BOOL cs2::initialize(void)
 					!strcmpi_imp(netvar_name, "m_pWeaponServices"))
 				{
 					netvars::m_pWeaponServices = *(int*)(dos_header + j + 0x10);
-				}
+				}/*
 				else if (!netvars::m_sSanitizedPlayerName && network_enable && !strcmpi_imp(netvar_name, "m_sSanitizedPlayerName"))
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_sSanitizedPlayerName = *(int*)(dos_header + j + 0x08 + 0x10);
-				}
+				}*/
 			}
 		}
 		vm::free_module(dump_client);
@@ -796,6 +800,7 @@ QWORD cs2::entity::get_client_entity(int index)
 }
 BOOL cs2::entity::is_player(QWORD controller)
 {
+	/*
 	if (vm::get_target_os() == VmOs::Linux)
 	{
 		return 1;
@@ -810,6 +815,11 @@ BOOL cs2::entity::is_player(QWORD controller)
 	// cc
 	//
 	return value == 0xCCC301B0;
+	*/
+	//
+	// deprecated function, just compiler fix
+	//
+	return controller != 0;
 }
 QWORD cs2::entity::get_player(QWORD controller)
 {
@@ -833,10 +843,12 @@ BOOL cs2::entity::has_defuser(QWORD entity)
 {
 	return (BOOL)vm::read_i8(game_handle, entity + netvars::m_bPawnHasDefuser);
 }
+/*
 QWORD cs2::entity::get_name_address(QWORD player)
 {
 	return vm::read_i64(game_handle, player + netvars::m_sSanitizedPlayerName);
 }
+*/
 int cs2::get_crosshairalpha(void)
 {
 	return vm::read_i32(game_handle, convars::cl_crosshairalpha + 0x40);
@@ -986,6 +998,7 @@ DWORD cs2::player::get_crosshair_id(QWORD player)
 {
 	return vm::read_i32(game_handle, player + netvars::m_iIDEntIndex);
 }
+
 DWORD cs2::player::get_local_player_index(QWORD player)
 {
 	return vm::read_i32(game_handle, player + netvars::m_iOldIDEntIndex);
@@ -1048,7 +1061,7 @@ cs2::WEAPON_CLASS cs2::player::get_weapon_class(QWORD player)
 	//
 	// C_EconEntity::m_AttributeManager + C_AttributeContainer::m_Item + C_EconItemView::m_iItemDefinitionIndex
 	//
-	WORD weapon_index = vm::read_i16(game_handle, weapon + 0x1098 + 0x50 + 0x1BA);
+	WORD weapon_index = vm::read_i16(game_handle, weapon + 0x1090 + 0x50 + 0x1BA);
 
 		/* shotgun */
 	{
