@@ -35,7 +35,6 @@
 
 #endif
 
-
 namespace cs2
 {
 	extern vm_handle game_handle ;
@@ -50,6 +49,7 @@ namespace cs2
 		Rifle = 5,
 		Zeus = 6,
 		Shotgun = 7,
+		C4 = 8,
 	} ;
 
 	typedef struct
@@ -139,6 +139,7 @@ namespace cs2
 		WEAPON_CLASS get_weapon_class(QWORD player);
 		QWORD get_node(QWORD player);
 		QWORD get_weapon_address(QWORD player);
+		BOOL HasC4(QWORD player);
 		BOOL  is_defusing(QWORD player);
 		BOOL  is_valid(QWORD player, QWORD node);
 

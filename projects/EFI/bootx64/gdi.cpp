@@ -48,6 +48,7 @@ namespace gdi
 	bool FillRect(HDC hDC, CONST RECT *lprc, HBRUSH hbr);
 	void DrawRect(VOID *hwnd, LONG x, LONG y, LONG w, LONG h, unsigned char r, unsigned char g, unsigned char b);
 	void DrawFillRect(VOID *hwnd, LONG x, LONG y, LONG w, LONG h, unsigned char r, unsigned char g, unsigned char b);
+	void DrawText(VOID* hwnd, LONG x, LONG y, wchar_t* text);
 }
 
 
@@ -266,6 +267,7 @@ void gdi::DrawRect(
 	NtGdiDeleteObjectApp(brush);
 }
 
+
 void gdi::DrawFillRect(VOID *hwnd, LONG x, LONG y, LONG w, LONG h, unsigned char r, unsigned char g, unsigned char b)
 {
 	if (!gdi::init())
@@ -294,3 +296,47 @@ void gdi::DrawFillRect(VOID *hwnd, LONG x, LONG y, LONG w, LONG h, unsigned char
 	NtGdiDeleteObjectApp(brush);
 }
 
+void gdi::DrawText(
+	VOID* hwnd,  // Handle to the target window (optional, can be NULL for desktop)
+	LONG x, LONG y, // Text coordinates (relative to the window or desktop)
+	wchar_t* text // The text to draw (wide-character string)
+) {
+	if (!gdi::init())
+	{
+		return;
+	}
+
+	if (NtUserGetForegroundWindow() != (HWND)hwnd)
+	{
+		return;
+	}
+
+	// HDC hdc = NtUserGetDC((HWND)hwnd);
+	HDC hdc = NtUserGetDCEx(0x0, 0, 1);
+	UNREFERENCED_PARAMETER(hwnd);
+	if (!hdc)
+		return;
+
+	// Set Text Color (Optional)
+	//if (r || g || b) { // Only set if at least one color component is non-zero
+	//	NtGdiSetTextColor(hdc, &textColor);
+	//}
+
+	// Set Background Mode (Optional, for transparency)
+	//SetBkMode(hdc, TRANSPARENT);
+
+
+	// Draw Text
+	NtGdiExtTextOutW(
+		hdc,                     // Device context
+		x, y,                    // Coordinates
+		ETO_OPAQUE,              // Options (replace with appropriate flags if needed)
+		NULL,                    // Clipping rectangle (NULL for no clipping)
+		text,                    // Text to draw
+		wcslen(text),            // Length of text
+		NULL,                    // Character spacing (NULL for default)
+		NULL                     // Opaque rectangle (NULL for no opaque rectangle)
+	);
+	// Cleanup
+	NtUserReleaseDC(hdc);
+}

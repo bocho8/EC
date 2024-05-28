@@ -61,6 +61,44 @@ namespace client
 		rect.h = (int)h;
 		SDL_FillSurfaceRect(sdl_surface, &rect, SDL_MapRGB(sdl_surface->format, r, g, b));
 	}
+
+	void DrawCheatText(void* hwnd, int x, int y, const wchar_t* text)
+	{
+		// Error Checking
+		if (!hwnd || !text) {
+			// Log an error
+			return;
+		}
+
+		// Get Device Context (HDC) from Window Handle
+		HDC hdc = GetDC((HWND)hwnd);
+		if (!hdc) {
+			// Log an error (failed to get HDC)
+			return;
+		}
+
+		// Set Text Color
+		//SetTextColor(hdc, color);
+
+		// Set Background Mode to Transparent (optional)
+		SetBkMode(hdc, TRANSPARENT);
+
+		// Create a RECT variable
+		RECT textRect = { 0, 0, 0, 0 }; // Initialize all members to zero
+
+		// Calculate Text Rect
+		::DrawTextW(hdc, text, -1, &textRect, DT_CALCRECT | DT_NOPREFIX);
+
+		// Adjust Text Rect Position (if needed)
+		textRect.left = x;
+		textRect.top = y;
+
+		// Draw the Text
+		::DrawTextW(hdc, text, -1, &textRect, DT_LEFT | DT_NOPREFIX);
+
+		// Release the Device Context (HDC)
+		ReleaseDC((HWND)hwnd, hdc);
+	}
 }
 
 int main(void)

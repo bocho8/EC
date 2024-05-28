@@ -102,6 +102,8 @@ namespace config
 	static DWORD triggerbot_button;
 	static DWORD incrosstriggerbot_button;
 	static BOOL  trigger_aim;
+	static float triggerbot_fov;
+	static BOOL triggerbot_multibone;
 	static BOOL  visuals_enabled;
 	static BOOL  spotted_esp;
 }
@@ -119,10 +121,23 @@ inline void cs2::features::update_settings(void)
 	// default global settings
 	//
 	//standlone rcs is still weird but better than default, improve it or don't use it
+	//config::triggerbot_fov = 1;
+	config::triggerbot_multibone = 0;
 	config::standalone_rcs = 0;
 	config::aimbot_enabled = 1;
 	config::aimbot_multibone = 1;
-
+	config::spotted_esp = 0;
+	config::aimbot_visible_check = 1;
+	config::triggerbot_visible_check = 0;
+	config::bhop = 0;
+	config::trigger_aim = 1;
+	config::aimbot_button = 317;
+	config::triggerbot_button = 320;
+	config::incrosstriggerbot_button = 82;
+	config::aimbot_fov = 1.5f;
+	config::aimbot_smooth = 3.0f;
+	config::visuals_enabled = 1;
+	config::visualize_hitbox = 0;
 
 #ifdef _KERNEL_MODE
 	config::visuals_enabled = 1;
@@ -137,36 +152,61 @@ inline void cs2::features::update_settings(void)
 		config::aimbot_enabled = 0;
 		break;
 	case 201:
+		config::aimbot_fov = 1.5;
+		config::aimbot_smooth = 3;
 		config::spotted_esp = 1;
 		config::aimbot_enabled = 1;
 		config::triggerbot_visible_check = 1;
 		config::aimbot_visible_check = 1;
 		break;
 	case 202:
+		config::aimbot_fov = 1.5;
+		config::aimbot_smooth = 3;
+		break;
+	case 203:
 		config::visuals_enabled = 1;
 		config::aimbot_enabled = 0;
 		break;
-	case 203:
+	case 204:
 		config::spotted_esp = 1;
+		config::triggerbot_visible_check = 1;
 		config::aimbot_enabled = 0;
 		break;
-
-
-
+	case 205:
+		config::aimbot_multibone = 0;
+		config::aimbot_fov = 45;
+		config::aimbot_smooth = 1.5;
+		config::visualize_hitbox = 1;
+		break;
+	case 206:
+		config::aimbot_fov = 2;
+		config::aimbot_smooth = 4;
+		config::triggerbot_fov = .75;
+		break;
+	case 207:
+		config::aimbot_fov = 2;
+		config::aimbot_smooth = 4;
+		config::triggerbot_fov = .75;
+		config::triggerbot_multibone = 1;
+		break;
+	case 208:
+		config::aimbot_fov = 1;
+		config::aimbot_smooth = 2;
+		break;
 
 	default:
-		config::spotted_esp = 0;
-		config::aimbot_visible_check = 1;
-		config::triggerbot_visible_check = 0;
-		config::bhop = 0;
-		config::trigger_aim	  = 1;
-		config::aimbot_button     = 317;
-		config::triggerbot_button = 320;
-		config::incrosstriggerbot_button = 82;
-		config::aimbot_fov        = 2.0f;
-		config::aimbot_smooth     = 2.0f;
-		config::visuals_enabled   = 1;
-		config::visualize_hitbox  = 0;
+	//	config::spotted_esp = 0;
+	//	config::aimbot_visible_check = 1;
+	//	config::triggerbot_visible_check = 0;
+	//	config::bhop = 0;
+	//	config::trigger_aim	  = 1;
+	//	config::aimbot_button     = 317;
+	//	config::triggerbot_button = 320;
+	//	config::incrosstriggerbot_button = 82;
+	//	config::aimbot_fov        = 1.5f;
+	//	config::aimbot_smooth     = 3.0f;
+	//	config::visuals_enabled   = 1;
+	//	config::visualize_hitbox  = 0;
 		break;
 	}
 
@@ -183,6 +223,9 @@ inline void cs2::features::update_settings(void)
 	case cs2::WEAPON_CLASS::Pistol:
 		config::aimbot_multibone = 0;
 		config::trigger_aim = 1;
+		break;
+	case cs2::WEAPON_CLASS::C4:
+		config::aimbot_enabled = 0;
 		break;
 	}
 
@@ -224,6 +267,9 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 
 	if (b_triggerbot_button && mouse_down_ms == 0)
 	{
+		if (config::triggerbot_fov){
+			config::aimbot_fov = config::triggerbot_fov;
+		}
 		//for Zeusbot
 		if (weapon_class == cs2::WEAPON_CLASS::Zeus)
 		{
@@ -255,7 +301,15 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 		{
 			cs2:config::aimbot_multibone = 0;
 		}
+		if (config::triggerbot_multibone)
+		{
+			config::aimbot_multibone = 1;
+		}
+		//team check
+		if (cs2::gamemode::is_ffa() == 0 && cs2::player::get_team_num(crosshair_target) == cs2::player::get_team_num(local_player))
+			return;
 
+		//triggerbot crosshair check(accuracy boost)
 		if (cs2::player::get_health(crosshair_target) < 1 && target_distance < 180)
 			return;
 
@@ -330,7 +384,7 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 			if ( (math::vec_min_max(eye, dir,
 				math::vec_transform(coll.min, matrix),
 				math::vec_transform(coll.max, matrix),
-				coll.radius)) && (target_distance < 180) or weapon_class == cs2::WEAPON_CLASS::Sniper or weapon_class == cs2::WEAPON_CLASS::Zeus)
+				coll.radius)) && (target_distance < 180) or weapon_class == cs2::WEAPON_CLASS::Sniper or weapon_class == cs2::WEAPON_CLASS::Zeus or config::triggerbot_multibone or !(config::aimbot_enabled))
 			{
 				DWORD current_ms = cs2::engine::get_current_ms();
 				if (current_ms > mouse_up_ms)
@@ -344,7 +398,6 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 	}
 	if (b_incrosstrigger_button && mouse_down_ms == 0)
 	{
-
 		DWORD crosshair_id = cs2::player::get_crosshair_id(local_player);
 		//if (weapon_class == cs::WEAPON_CLASS::Sniper)
 		//{
@@ -713,6 +766,7 @@ void cs2::features::run(void)
 	float smooth_y = 0.00f;
 
 	DWORD ms = 0;
+
 	if (config::aimbot_smooth >= 1.0f)
 	{
 		if (qabs(x) > 1.0f)
@@ -1075,12 +1129,9 @@ static void cs2::features::esp(QWORD local_player, QWORD target_player, vec3 hea
 	UNREFERENCED_PARAMETER(head);
 #endif
 
-	if (config::spotted_esp)
+	if (config::spotted_esp && !(cs2::player::is_visible(target_player)))
 	{
-		if (!cs2::player::is_visible(target_player))
-		{
 			return;
-		}
 	}
 	vec3 origin = cs2::player::get_origin(target_player);
 	vec3 top_origin = origin;
@@ -1191,7 +1242,11 @@ static void cs2::features::esp(QWORD local_player, QWORD target_player, vec3 hea
 	{
 		return;
 	}
+	int barWidth = 4.5;
+	int barHeight = box_height;
 
+	int greenBarHeight = static_cast<int>((float)cs2::player::get_health(target_player) / 100.0f * barHeight);
+	int redOverlayHeight = barHeight - greenBarHeight;
 #ifdef __linux__
 	client::DrawRect((void *)0, x, y, box_width, box_height, (unsigned char)r, (unsigned char)g, (unsigned char)b);
 #else
@@ -1201,6 +1256,12 @@ static void cs2::features::esp(QWORD local_player, QWORD target_player, vec3 hea
 	if (sdl_window_data == 0)
 		return;
 	QWORD hwnd = cs2::sdl::get_hwnd(sdl_window_data);
+	#ifdef _KERNEL_MODE
+	wchar_t name[] = L"Testing"; // Array (modifiable)
+	client::DrawText((void*)hwnd, x, y, name);
+	#endif
+	client::DrawRect((void*)hwnd, x - barWidth, y, barWidth, box_height, 0, 255, 0);
+	client::DrawRect((void*)hwnd, x - barWidth, y, barWidth, redOverlayHeight, 255, 0, 0);
 
 	client::DrawRect((void *)hwnd, x, y, box_width, box_height, (unsigned char)r, (unsigned char)g, (unsigned char)b);
 #endif
@@ -1272,8 +1333,16 @@ static void cs2::features::render_normal_position(vec3 pos, int width, int heigh
 		return;
 	QWORD hwnd = cs2::sdl::get_hwnd(sdl_window_data);
 
-	//client::DrawRect((void*)hwnd, x, y, box_width, box_height, (unsigned char)r, (unsigned char)g, (unsigned char)b);
+	#ifdef _KERNEL_MODE
+	wchar_t name[] = L"Testing"; // Array (modifiable)
+	client::DrawText((void*)hwnd, x, y, name);
+	#endif
+
+	//client::DrawRect((void*)hwnd, x - barWidth, y, barWidth, box_height, 0, 255, 0);
 	//client::DrawRect((void*)hwnd, x - barWidth, y, barWidth, redOverlayHeight, 255, 0, 0);
+
 	client::DrawFillRect((void*)hwnd, x, y, box_width, box_height, (unsigned char)r, (unsigned char)g, (unsigned char)b);
+
+
 #endif
 }

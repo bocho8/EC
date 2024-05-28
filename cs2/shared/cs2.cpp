@@ -101,6 +101,7 @@ namespace cs2
 		static int m_bPawnHasDefuser = 0;
 		static int m_hActiveWeapon = 0;
 		static int m_pWeaponServices = 0;
+		static int m_hMyWeapons = 0x40;
 		//static int m_sSanitizedPlayerName = 0;
 	}
 	static BOOL initialize(void);
@@ -1109,7 +1110,6 @@ cs2::WEAPON_CLASS cs2::player::get_weapon_class(QWORD player)
 			47, // {"decoy"},
 			46, // {"molotov"},
 			48, // {"incgrenade"},
-			49, // {"c4"},
 		};
 		for (int i = 0; i < sizeof(data) / sizeof(*data); i++)
 		{
@@ -1155,6 +1155,19 @@ cs2::WEAPON_CLASS cs2::player::get_weapon_class(QWORD player)
 			}
 		}
 	}
+	/* C4 */
+	{
+		WORD data[] = {
+			49, // {"c4"},
+		};
+		for (int i = 0; i < sizeof(data) / sizeof(*data); i++)
+		{
+			if (data[i] == weapon_index)
+			{
+				return cs2::WEAPON_CLASS::C4;
+			}
+		}
+	}
 	return cs2::WEAPON_CLASS::Rifle;
 }
 QWORD cs2::player::get_node(QWORD player)
@@ -1169,6 +1182,41 @@ QWORD cs2::player::get_weapon_address(QWORD player)
 	int index = vm::read_i32(game_handle, weapon_services + netvars::m_hActiveWeapon) & 0xFFF;
 	return cs2::entity::get_client_entity(index);
 }
+/*
+BOOL cs2::player::HasC4(QWORD player)
+{
+	static bool has_c4 = false;
+	static int MAX_WEAPONS = 9;
+	static int C4_CLASS = 49;
+
+	for (int i = 0; i < MAX_WEAPONS; i++)
+	{
+		QWORD weapon_services = vm::read_i64(game_handle, player + netvars::m_pWeaponServices); 
+		if (!weapon_services)
+			return 0;
+
+		int weaponIndex = vm::read_i32(game_handle, weapon_services + netvars::m_hMyWeapons);
+		if (weaponIndex < 0 || weaponIndex >= MAX_WEAPONS) {
+			// Handle error: Invalid weapon index
+			return false;
+		}
+		auto my_weapons = this->m_hMyWeapons()[weaponIndex + i].Get(); // Use playerObj
+
+		for (int i = 0; i < MAX_WEAPONS; i++) {
+			auto weapon = this->m_hMyWeapons()[weaponIndex + i].Get(); // Adjust index based on weapon list structure
+			if (!weapon) {
+				// Handle error: Invalid weapon pointer
+				continue;
+			}
+
+			if (weapon->GetClientClass() && weapon->GetClientClass()->m_ClassID == C4_CLASS) {
+				return true; // C4 found
+			}
+		}
+
+		return false; // C4 not found
+}
+*/
 BOOL cs2::player::is_defusing(QWORD player)
 {
 	return (BOOL)vm::read_i8(game_handle, player + netvars::m_bIsDefusing);

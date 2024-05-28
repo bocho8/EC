@@ -20,6 +20,8 @@ extern "C"
 	QWORD _IofCompleteRequest;
 	QWORD _IoReleaseRemoveLockEx;
 }
+#define IOCTL_READ_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_WRITE_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 namespace km
 {
@@ -27,6 +29,27 @@ namespace km
 	BOOLEAN initialize(QWORD ntoskrnl, QWORD fbase, QWORD fsize);
 	DWORD PsGetThreadWin32ThreadOffset;
 	QWORD __fastcall PsGetThreadWin32ThreadHook(QWORD rcx);
+
+	NTSTATUS DispatchDeviceControl(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+		// Get the IOCTL code and parameters from the IRP (I/O Request Packet)
+		PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(Irp);
+		ULONG controlCode = irpSp->Parameters.DeviceIoControl.IoControlCode;
+
+		switch (controlCode) {
+		case IOCTL_READ_MEMORY:
+			// Read data from kernel memory and copy to user buffer
+			break;
+		case IOCTL_WRITE_MEMORY:
+			// Copy data from user buffer to kernel memory
+			break;
+			// ... other cases for your IOCTL codes
+		}
+
+		// Complete the IRP (set status and return)
+		Irp->IoStatus.Status = STATUS_SUCCESS;
+		IoCompleteRequest(Irp, IO_NO_INCREMENT);
+		return STATUS_SUCCESS;
+	}
 
 	NTSTATUS (__fastcall *oIopReadFile)(
 		__int64 a1,
@@ -82,6 +105,7 @@ namespace gdi
 {
 	void DrawRect(void *hwnd, LONG x, LONG y, LONG w, LONG h, unsigned char r, unsigned char g, unsigned char b);
 	void DrawFillRect(VOID *hwnd, LONG x, LONG y, LONG w, LONG h, unsigned char r, unsigned char g, unsigned char b);
+	void DrawText(VOID* hwnd, LONG x, LONG y, wchar_t* text);
 }
 
 namespace client
@@ -119,6 +143,11 @@ namespace client
 	void DrawFillRect(void *hwnd, int x, int y, int w, int h, unsigned char r, unsigned char g, unsigned char b)
 	{
 		gdi::DrawFillRect(hwnd, x, y, w, h, r, g, b);
+	}
+
+	void DrawText(void *hwnd, int x, int y, wchar_t* text)
+	{
+		gdi::DrawText(hwnd, x, y, text);
 	}
 }
 
