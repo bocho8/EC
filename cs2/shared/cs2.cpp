@@ -46,9 +46,9 @@ namespace cs2
 		DWORD m_bBombDropped = 0x9A4;				// bool
 
 		//offsets.cs(these update often)
-		DWORD dwGameRules = 0x1A00D08;				//pointer
+		DWORD dwGameRules = 0x1A01EE8;				//pointer
 
-		DWORD dwGlobalVars = 0x1801BF0;				//pointer
+		DWORD dwGlobalVars = 0x1802BF8;				//pointer
 
 		QWORD game_rules;
 		QWORD global_vars;
@@ -71,6 +71,8 @@ namespace cs2
 	}
 	namespace netvars
 	{
+		static int m_nTickBase = 0x5F8; // uint32 client.dll.cs
+		static int m_flSimulationTime = 0x390; // float32 //client.dll.cs
 		static int m_entitySpottedState = 0;//m_entitySpottedState = 0x1698;
 		static int m_bSpotted = 0; //m_bSpotted = 0x8;
 		static int m_bSpottedByMask = 0; // m_bSpottedByMask = 0xC;
@@ -93,7 +95,7 @@ namespace cs2
 		//static int m_angEyeAngles = 0;
 		static int m_iIDEntIndex = 0x13A8;
 		//client.dll.cs
-		static int m_iOldIDEntIndex = 0;
+		static int m_iOldIDEntIndex = 0x13CC;
 		static int m_vOldOrigin = 0;
 		static int m_pClippingWeapon = 0;
 		static int v_angle = 0;
@@ -370,6 +372,7 @@ static BOOL cs2::initialize(void)
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_vecViewOffset = *(int*)(entry + 0x08 + 0x10);
+				if (netvars::m_vecOrigin > 0x200) netvars::m_vecOrigin = 0;
 			}
 			else if (!netvars::m_aimPunchCache && !strcmpi_imp(netvar_name, "m_aimPunchCache") && network_enable)
 			{
@@ -410,14 +413,14 @@ static BOOL cs2::initialize(void)
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_vecOrigin = *(int*)(entry + 0x08 + 0x10);
+				if (netvars::m_vecOrigin > 0x200) netvars::m_vecOrigin = 0;
 			}
-			if (netvars::m_vecOrigin > 0x200) netvars::m_vecOrigin = 0;
-			
+			/*
 			else if (!netvars::m_iIDEntIndex && !strcmpi_imp(netvar_name, "m_iIDEntIndex") && network_enable)
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_iIDEntIndex = *(int*)(entry + 0x08 + 0x10);
-			}
+			}*/
 			else if (!netvars::m_vOldOrigin && !strcmpi_imp(netvar_name, "m_vOldOrigin"))
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08));
