@@ -1,4 +1,6 @@
 #include <Uefi.h>
+#include <ntifs.h>
+
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -6,6 +8,7 @@
 #include <Guid/MemoryAttributesTable.h>
 #include <intrin.h>
 #include "globals.h"
+
 
 extern "C"
 {

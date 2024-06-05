@@ -1,6 +1,8 @@
 #include <ntifs.h>
 #include "globals.h"
 #include <intrin.h>
+#include <ntddk.h>
+#include <wdm.h>
 #include "../../../cs2/shared/cs2game.h"
 #include "../../../csgo/shared/csgogame.h"
 #include "../../../apex/shared/apexgame.h"
@@ -20,8 +22,6 @@ extern "C"
 	QWORD _IofCompleteRequest;
 	QWORD _IoReleaseRemoveLockEx;
 }
-#define IOCTL_READ_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define IOCTL_WRITE_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 namespace km
 {
@@ -30,26 +30,6 @@ namespace km
 	DWORD PsGetThreadWin32ThreadOffset;
 	QWORD __fastcall PsGetThreadWin32ThreadHook(QWORD rcx);
 
-	NTSTATUS DispatchDeviceControl(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
-		// Get the IOCTL code and parameters from the IRP (I/O Request Packet)
-		PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(Irp);
-		ULONG controlCode = irpSp->Parameters.DeviceIoControl.IoControlCode;
-
-		switch (controlCode) {
-		case IOCTL_READ_MEMORY:
-			// Read data from kernel memory and copy to user buffer
-			break;
-		case IOCTL_WRITE_MEMORY:
-			// Copy data from user buffer to kernel memory
-			break;
-			// ... other cases for your IOCTL codes
-		}
-
-		// Complete the IRP (set status and return)
-		Irp->IoStatus.Status = STATUS_SUCCESS;
-		IoCompleteRequest(Irp, IO_NO_INCREMENT);
-		return STATUS_SUCCESS;
-	}
 
 	NTSTATUS (__fastcall *oIopReadFile)(
 		__int64 a1,

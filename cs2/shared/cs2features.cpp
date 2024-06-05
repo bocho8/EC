@@ -121,23 +121,23 @@ inline void cs2::features::update_settings(void)
 	// default global settings
 	//
 	//standlone rcs is still weird but better than default, improve it or don't use it
-	//config::triggerbot_fov = 1;
+	//config::triggerbot_fov = 1; 
 	config::triggerbot_multibone = 0;
-	config::standalone_rcs = 0;
+	config::standalone_rcs = 0; //probably dont use
 	config::aimbot_enabled = 1;
 	config::aimbot_multibone = 1;
-	config::spotted_esp = 0;
-	config::aimbot_visible_check = 1;
+	config::spotted_esp = 0; //visible only esp
+	config::aimbot_visible_check = 1; //aimbot visible check default on
 	config::triggerbot_visible_check = 0;
 	config::bhop = 0;
 	config::trigger_aim = 1;
-	config::aimbot_button = 317;
-	config::triggerbot_button = 320;
-	config::incrosstriggerbot_button = 82;
+	config::aimbot_button = 317; //mouse1
+	config::triggerbot_button = 320; //mouse5
+	config::incrosstriggerbot_button = 82; //left alt
 	config::aimbot_fov = 1.5f;
 	config::aimbot_smooth = 3.0f;
 	config::visuals_enabled = 1;
-	config::visualize_hitbox = 0;
+	config::visualize_hitbox = 0; //show aim location
 
 #ifdef _KERNEL_MODE
 	config::visuals_enabled = 1;
@@ -164,36 +164,44 @@ inline void cs2::features::update_settings(void)
 		config::aimbot_smooth = 3;
 		break;
 	case 203:
+		config::aimbot_fov = 2;
+		config::aimbot_smooth = 2;
+		break;
+	case 204:
+		config::aimbot_fov = 4;
+		config::aimbot_smooth = 2;
+		break;
+	case 205:
 		config::visuals_enabled = 1;
 		config::aimbot_enabled = 0;
 		break;
-	case 204:
+	case 206:
 		config::spotted_esp = 1;
 		config::triggerbot_visible_check = 1;
 		config::aimbot_enabled = 0;
 		break;
-	case 205:
+	case 207:
 		config::aimbot_multibone = 0;
 		config::aimbot_fov = 45;
 		config::aimbot_smooth = 1.5;
 		config::visualize_hitbox = 1;
 		break;
-	case 206:
+	case 208:
 		config::aimbot_fov = 2;
 		config::aimbot_smooth = 4;
 		config::triggerbot_fov = .75;
 		break;
-	case 207:
+	case 209:
 		config::aimbot_fov = 2;
 		config::aimbot_smooth = 4;
 		config::triggerbot_fov = .75;
 		config::triggerbot_multibone = 1;
 		break;
-	case 208:
+	case 210:
 		config::aimbot_fov = 1;
 		config::aimbot_smooth = 2;
 		break;
-
+	
 	default:
 	//	config::spotted_esp = 0;
 	//	config::aimbot_visible_check = 1;
@@ -1121,17 +1129,18 @@ static void cs2::features::esp(QWORD local_player, QWORD target_player, vec3 hea
 	client::DrawFillRect((void *)hwnd, x, y, w, h, (unsigned char)r, (unsigned char)g, (unsigned char)b);
 #endif
 	*/
-	
-	
-	
+		
 #ifndef __linux__
 	UNREFERENCED_PARAMETER(local_player);
 	UNREFERENCED_PARAMETER(head);
 #endif
 
-	if (config::spotted_esp && !(cs2::player::is_visible(target_player)))
+	if (!(cs2::player::get_health(local_player)) < 1 )
 	{
+		if (config::spotted_esp && !(cs2::player::is_visible(target_player))) //fix if dead
+		{
 			return;
+		}
 	}
 	vec3 origin = cs2::player::get_origin(target_player);
 	vec3 top_origin = origin;
@@ -1318,13 +1327,13 @@ static void cs2::features::render_normal_position(vec3 pos, int width, int heigh
 	{
 		return;
 	}
+	/*
+	//int barWidth = 4.5;
+	//int barHeight = box_height;
 
-	int barWidth = 4.5;
-	int barHeight = box_height;
-
-	int greenBarHeight = static_cast<int>((float)cs2::player::get_health(target_player) / 100.0f * barHeight);
-	int redOverlayHeight = barHeight - greenBarHeight;
-
+	//int greenBarHeight = static_cast<int>((float)cs2::player::get_health(target_player) / 100.0f * barHeight);
+	//int redOverlayHeight = barHeight - greenBarHeight;
+	*/
 #ifdef __linux__
 	client::DrawfillRect((void*)0, x, y, box_width, box_height, (unsigned char)r, (unsigned char)g, (unsigned char)b);
 #else
@@ -1332,14 +1341,15 @@ static void cs2::features::render_normal_position(vec3 pos, int width, int heigh
 	if (sdl_window_data == 0)
 		return;
 	QWORD hwnd = cs2::sdl::get_hwnd(sdl_window_data);
-
-	#ifdef _KERNEL_MODE
-	wchar_t name[] = L"Testing"; // Array (modifiable)
-	client::DrawText((void*)hwnd, x, y, name);
-	#endif
+	/*
+	//#ifdef _KERNEL_MODE
+	//wchar_t name[] = L"Testing"; // Array (modifiable)
+	//client::DrawText((void*)hwnd, x, y, name);
+	//#endif
 
 	//client::DrawRect((void*)hwnd, x - barWidth, y, barWidth, box_height, 0, 255, 0);
 	//client::DrawRect((void*)hwnd, x - barWidth, y, barWidth, redOverlayHeight, 255, 0, 0);
+	*/
 
 	client::DrawFillRect((void*)hwnd, x, y, box_width, box_height, (unsigned char)r, (unsigned char)g, (unsigned char)b);
 
