@@ -190,7 +190,6 @@
     <ClCompile Include="..\..\..\apex\shared\apex.cpp" />
     <ClCompile Include="..\..\..\apex\shared\apexfeatures.cpp" />
     <ClCompile Include="..\..\..\library\vm\km_ctx\vm.cpp" />
-    <ClCompile Include="api.cpp" />
     <ClCompile Include="gdi.cpp" />
     <ClCompile Include="kernel.cpp" />
     <ClCompile Include="main.cpp" />

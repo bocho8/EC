@@ -1,6 +1,4 @@
 #include <Uefi.h>
-#include <ntifs.h>
-
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
