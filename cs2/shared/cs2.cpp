@@ -46,9 +46,9 @@ namespace cs2
 		DWORD m_bBombDropped = 0x9A4;				// bool
 
 		//offsets.cs(these update often)
-		DWORD dwGameRules = 0x1A03F58;				//pointer
+		DWORD dwGameRules = 0x1A12418;				//pointer
 
-		DWORD dwGlobalVars = 0x1804C58;				//pointer
+		DWORD dwGlobalVars = 0x180E4E0;				//pointer
 
 		QWORD game_rules;
 		QWORD global_vars;
@@ -693,7 +693,7 @@ BOOL cs2::sdl::get_window_info(QWORD window, WINDOW_INFO *info)
 		int x,y,w,h;
 	} wvec4 ;
 	wvec4 buffer{};
-	if (!vm::read(game_handle, window + 0x20, &buffer, sizeof(buffer)))
+	if (!vm::read(game_handle, window + 0x18, &buffer, sizeof(buffer)))
 		return 0;
 	info->x = (float)buffer.x;
 	info->y = (float)buffer.y;
