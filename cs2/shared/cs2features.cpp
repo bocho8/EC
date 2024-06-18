@@ -103,6 +103,7 @@ namespace config
 	static DWORD incrosstriggerbot_button;
 	static BOOL  trigger_aim;
 	static float triggerbot_fov;
+	static float triggerbot_smooth;
 	static BOOL triggerbot_multibone;
 	static BOOL  visuals_enabled;
 	static BOOL  spotted_esp;
@@ -122,6 +123,7 @@ inline void cs2::features::update_settings(void)
 	//
 	//standlone rcs is still weird but better than default, improve it or don't use it
 	//config::triggerbot_fov = 1; 
+	//config::triggerbot_smooth = 1;
 	config::triggerbot_multibone = 0;
 	config::standalone_rcs = 0; //probably dont use
 	config::aimbot_enabled = 1;
@@ -277,6 +279,9 @@ static void cs2::features::has_target_event(QWORD local_player, QWORD target_pla
 	{
 		if (config::triggerbot_fov){
 			config::aimbot_fov = config::triggerbot_fov;
+		}
+		if (config::triggerbot_smooth) {
+			config::aimbot_smooth = config::triggerbot_smooth;
 		}
 		//for Zeusbot
 		if (weapon_class == cs2::WEAPON_CLASS::Zeus)
