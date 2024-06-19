@@ -8,6 +8,7 @@ bhop only works in usermode and efi at the moment and to use bhop just rebind yo
 	// default global settings
 	//
 	//standlone rcs is still weird but better than default, improve it or don't use it
+ 	//config::triggerbot_smooth = 1; 
 	//config::triggerbot_fov = 1; 
 	config::triggerbot_multibone = 0; 
 	config::standalone_rcs = 0; //probably dont use
