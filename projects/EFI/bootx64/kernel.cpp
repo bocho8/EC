@@ -216,7 +216,7 @@ QWORD __fastcall km::PsGetThreadWin32ThreadHook(QWORD rcx)
 	//
 	// previous mode == KernelMode
 	//
-	if (*(unsigned char*)(current_thread + 0x232) == 0)
+	if (*(unsigned char*)(current_thread + 0x232) == 0)//232
 	{
 		return *(QWORD*)(rcx + PsGetThreadWin32ThreadOffset);
 	}
@@ -241,7 +241,7 @@ QWORD __fastcall km::PsGetThreadWin32ThreadHook(QWORD rcx)
 		return *(QWORD*)(rcx + PsGetThreadWin32ThreadOffset);
 	}
 
-	if (return_address > (NtUserPeekMessage + 0x191))
+	if (return_address > (NtUserPeekMessage + 0x191))//191
 	{
 		return *(QWORD*)(rcx + PsGetThreadWin32ThreadOffset);
 	}
