@@ -968,7 +968,7 @@ DWORD cs2::player::get_team_num(QWORD player)
 BOOL cs2::player::is_visible(QWORD player)
 {
 	//vm::write_float(game_handle, player + netvars::m_flDetectedByEnemySensorTime, 86400.f);
-	int mask = vm::read_i32(game_handle, (QWORD)(player + 0x2288 + 0x8));// m_entitySpottedState = 0x2288;
+	int mask = vm::read_i32(game_handle, (QWORD)(player + netvars::m_entitySpottedState + 0x8));// m_entitySpottedState = 0x2288;!now auto-updating!
 	int base = vm::read_i32(game_handle, (QWORD)(direct::local_player));
 	return (mask & (1 << base)) != 0;
 }
