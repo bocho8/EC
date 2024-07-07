@@ -5,3 +5,5 @@
 /projects/DMA/x64
 /projects/DMA/.vs
 /projects/EFI/bootx64/x64
+/output
+*.exe

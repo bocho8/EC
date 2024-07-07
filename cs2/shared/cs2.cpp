@@ -73,7 +73,7 @@ namespace cs2
 	{
 		static int m_nTickBase = 0x5F8; // uint32 client.dll.cs
 		static int m_flSimulationTime = 0x390; // float32 //client.dll.cs
-		static int m_entitySpottedState = 0;//m_entitySpottedState = 0x1698;
+		static int m_entitySpottedState = 0;//m_entitySpottedState = 0x2288;
 		static int m_bSpotted = 0; //m_bSpotted = 0x8;
 		static int m_bSpottedByMask = 0; // m_bSpottedByMask = 0xC;
 		static int m_MoveType = 0;
@@ -317,7 +317,7 @@ static BOOL cs2::initialize(void)
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x08 + 0x10));
 				netvars::m_iHealth = *(int*)(entry + 0x08 + 0x10);
 			}
-			else if ((netvars::m_entitySpottedState < 0x2278 || netvars::m_entitySpottedState > 0x14D0 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
+			else if ((netvars::m_entitySpottedState < 0x2288 || netvars::m_entitySpottedState > 0x14D0 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))//m_entitySpottedState = 0x2288;client.dll.cs
 			{
 				LOG("%s, %x\n", netvar_name, *(int*)(entry + 0x10));
 				netvars::m_entitySpottedState = *(int*)(entry + 0x10);
@@ -510,7 +510,7 @@ static BOOL cs2::initialize(void)
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x08 + 0x10));
 					netvars::m_iHealth = *(int*)(dos_header + j + 0x08 + 0x10);
 				}
-				else if ((netvars::m_entitySpottedState < 0x2278 || netvars::m_entitySpottedState > 0x14D0 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
+				else if ((netvars::m_entitySpottedState < 0x2288 || netvars::m_entitySpottedState > 0x14D0 || !netvars::m_entitySpottedState) && !strcmpi_imp(netvar_name, "m_entitySpottedState"))
 				{
 					LOG("%s, %x\n", netvar_name, *(int*)(dos_header + j + 0x10));
 					netvars::m_entitySpottedState = *(int*)(dos_header + j + 0x10);
@@ -702,7 +702,7 @@ BOOL cs2::sdl::get_window_info(QWORD window, WINDOW_INFO *info)
 }
 QWORD cs2::sdl::get_window_data(QWORD window)
 {
-	return vm::read_i64(game_handle, window + 0x120);
+	return vm::read_i64(game_handle, window + 0x128);
 }
 QWORD cs2::sdl::get_hwnd(QWORD window_data)
 {
@@ -968,7 +968,7 @@ DWORD cs2::player::get_team_num(QWORD player)
 BOOL cs2::player::is_visible(QWORD player)
 {
 	//vm::write_float(game_handle, player + netvars::m_flDetectedByEnemySensorTime, 86400.f);
-	int mask = vm::read_i32(game_handle, (QWORD)(player + netvars::m_entitySpottedState + 0x8));// m_entitySpottedState = 0x2288;!now auto-updating!
+	int mask = vm::read_i32(game_handle, (QWORD)(player + 0x2288 + 0x8));// m_entitySpottedState = 0x2288 < Update this when the aimbot isn't working
 	int base = vm::read_i32(game_handle, (QWORD)(direct::local_player));
 	return (mask & (1 << base)) != 0;
 }
