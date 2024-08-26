@@ -1,3 +1,5 @@
+updated hunter and mlh2865 EC to latest ekknod's branch 
+
 # EC
 open-source EC
 
