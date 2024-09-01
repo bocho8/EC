@@ -1,4 +1,4 @@
-updated hunter and mlh2865 EC to latest ekknod's branch 
+updated hunter and mlh2865 EC to latest ekknod's branch (latest game version) 
 
 # EC
 open-source EC
